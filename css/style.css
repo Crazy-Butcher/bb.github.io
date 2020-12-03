@@ -1,0 +1,25 @@
+.btn-create {
+    padding: 10px 15px;
+
+    border-radius: 10px;
+    border: none;
+    box-shadow: 1px 1px 3px rgb(3, 94, 136);
+
+    color: #fff;
+    text-transform: uppercase;
+    background-color: rgb(60, 165, 214);
+
+    transition: all 0.25s;
+}
+
+.btn-create:hover {
+    cursor: pointer;
+    background-color: rgb(14, 95, 133);
+}
+
+.new-elements {
+    min-height: 25vh;
+    margin-top: 25px;
+    
+    background-color: lightgreen;
+}
