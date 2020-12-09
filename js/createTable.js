@@ -1,95 +1,175 @@
-let tableName = document.getElementById('tableName');
-let numberRows = document.getElementById('numberRows').value;
-let numberColumns = document.getElementById('numberColumns').value;
+$(function () {
+    let tableSettings = $('.table-settings');
+    let tableName = $('#tableName');
+    let numberRows = $('#numberRows');
+    let numberColumns = $('#numberColumns');
+    let moreSettings = $('#moreSettings');
+    let moreSettingsHidden = $('.more-settings__hidden');
 
-let tableBorderWidth = document.getElementById('tableBorderWidth').value + 'px';
-let tableBorderType = document.querySelector('.table-border-type').value;
-let tableBorderColor = document.getElementById('tableBorderColor').value;
+    let tableBorderWidth = $('#tableBorderWidth');
+    let tableBorderType = $('.table-border-type');
+    let tableBorderColor = $('#tableBorderColor');
 
-let tableDataPadding = document.getElementById('tableDataPadding').value;
+    let tableDataPadding = $('#tableDataPadding');
 
-let tableDataColor = document.getElementById('tableDataColor').value;
-let tableFontSize = document.querySelector('.table-font-size').value;
-let tableFontColor = document.getElementById('tableFontColor').value;
+    let tableDataColor = $('#tableDataColor');
+    let tableFontSize = $('.table-font-size');
+    let tableFontColor = $('#tableFontColor');
 
-let tableDataWidth = document.getElementById('tableDataWidth').value;
-let dataBorderType = document.querySelector('.data-border-type').value;
-let dataBorderColor = document.getElementById('dataBorderColor').value;
+    let tableDataWidth = $('#tableDataWidth');
+    let dataBorderType = $('.data-border-type');
+    let dataBorderColor = $('#dataBorderColor');
 
-let btnCreate = document.querySelector('.btn-create');
-let btnRemove = document.querySelector('.btn-remove');
+    let modal = $('.modal');
+    let btnYes = $('.btn-yes');
+    let btnNo = $('.btn-no');
 
-function createTable() {
-    let table = createElem('table', 'table');
-    document.body.appendChild(table);
+    let btnCreate = $('.btn-create');
+    let btnRemove = $('.btn-remove');
 
-    let caption = createElem('caption', 'table-name', tableName.value);
-    table.appendChild(caption);
+    let table, row, data;
 
-    let thead = createElem('thead', 'table-header');
-    table.appendChild(thead);
-    createTheadContent(thead, 1, numberColumns);
+    function createTable() {
+        if(getTable()) {
+            manageError('p', 'error', 'Таблица может быть только одна!');
+        }
+        else {
+            modal.addClass('modal-hidden');
+            table = createElem('table', 'table');
+            
+            tableSettings.after(table);
 
-    let tbody = createElem('tbody', 'table-body');    
-    table.appendChild(tbody);
+            let caption = createElem('caption', 'table-name', tableName.val());
+            table.append(caption);
 
-    createTableContent(tbody, numberRows, numberColumns);
+            if (!moreSettings.checked) {
+                let thead = createElem('thead', 'table-header');
+                table.append(thead);
 
-    let tfoot = createElem('tfoot', 'table-footer');
-    table.appendChild(tfoot);
-    createTfootContent(tfoot, 1, numberColumns);
+                createTheadTfoot(thead, 1, numberColumns);
 
-    return table;
-}
+                let tfoot = createElem('tfoot', 'table-footer');
+                table.append(tfoot);
 
-function createElem(tag, className, text) {
-    let elem = document.createElement(tag);
-    elem.classList.add(className);
-    elem.textContent = text;
+                createTheadTfoot(tfoot, 1, numberColumns);
+            }
+            else {
+                table.style.border = tableBorderWidth.val() + 'px ' + tableBorderType.val() + tableBorderColor.val();
+            }
 
-    return elem;
-}
+            let tbody = createElem('tbody', 'table-body');    
+            table.append(tbody);
 
-function createTheadContent(thead, rows, cols) {
-    for (let i = 0; i < rows; i++) {
-        row = createElem('tr', 'table-row');
-        thead.appendChild(row);
+            createTableContent(tbody, numberRows, numberColumns);
+        }
+        return table;
+    }
 
-        for (let j = 0; j < cols; j++) {
-            data = createElem('td', 'table-data', 'Lorem ipsum dolor sit amet.');
-            row.appendChild(data);
+    function manageError(tag, className, text) {
+        let error;
+        modal.addClass('modal-hidden');
+
+        if(!error) {
+            error = createElem(tag, className, text);
+            tableSettings.after(error);
+
+            error = $('.error');
+
+            setTimeout(() => { error.addClass('error__display'); }, 500);
+            setTimeout(() => { error.remove(); }, 2000);
         }
     }
-    return thead;
-}
 
-function createTableContent(tbody, rows, cols) {
-    let row, data;
-    
-    for(let i = 0; i < rows; i++) {
-        row = createElem('tr', 'table-row');
-        tbody.appendChild(row);
+    function createElem(tag, className, text) {
+        let elem = document.createElement(tag);
 
-        for(let j = 0; j < cols; j++) {
-            data = createElem('td', 'table-data', 'Lorem ipsum dolor sit amet.');
-            row.appendChild(data);
+        elem.classList.add(className);
+        if(text) {
+            elem.textContent = text;
+        }
+
+        return elem;
+    }
+
+    function createTheadTfoot(tableSection, rows, cols) {
+        for (let i = 0; i < rows; i++) {
+            row = createElem('tr', 'table-row');
+            tableSection.append(row);
+
+            for (let j = 0; j < cols.val(); j++) {
+                data = createElem('td', 'table-data', 'Lorem ipsum dolor sit amet.');
+                row.append(data);
+            }
+        }
+        return tableSection;
+    }
+
+    function createTableContent(tbody, rows, cols) {
+        for(let i = 0; i < rows.val(); i++) {
+            row = createElem('tr', 'table-row');
+            tbody.append(row);
+
+            for(let j = 0; j < cols.val(); j++) {
+                data = createElem('td', 'table-data', 'Lorem ipsum dolor sit amet.');
+                row.append(data);
+
+                data = $('.table-data');
+                if (moreSettings.prop("checked")) {
+                    data.css({
+                        'padding': tableDataPadding.val() + 'px',
+                        'backgroundColor': tableDataColor.val(),
+                        'color': tableFontColor.val(),
+                        'border': `${tableDataWidth.val() + 'px'} ${dataBorderType.val()} ${dataBorderColor.val()}`
+                    });
+                    
+                    data.addClass(tableFontSize.val());
+                }
+            }
         }
     }
-}
 
-function createTfootContent(tfoot, rows, cols) {
-    for (let i = 0; i < rows; i++) {
-        row = createElem('tr', 'table-row');
-        tfoot.appendChild(row);
-
-        for (let j = 0; j < cols; j++) {
-            data = createElem('td', 'table-data', 'Lorem ipsum dolor sit amet.');
-            row.appendChild(data);
-        }
+    function getTable() {
+        return $('.table').hasClass('table');
     }
-    return tfoot;
-}
 
-btnCreate.addEventListener('click', function() {
-    let table = createTable();
+    function removeTable() {
+        getTable() ? $('.table').remove() : manageError('p', 'error', 'Удалять нечего!');
+    }
+
+    function getTableData() {
+        return $('.table-data');
+    }
+
+    btnCreate.on('click', function() {
+        modal.removeClass('modal-hidden');
+
+        btnYes.on('click', () => { table = createTable(); });
+        btnNo.on('click', () => { modal.addClass('modal-hidden'); });
+
+        document.addEventListener('keydown', function(event) {
+            if(event.key == "Enter") {
+                table = createTable();
+            }
+            if(event.key == "Escape") {
+                modal.addClass('modal-hidden');
+            }
+        });
+    });
+
+    btnRemove.on('click', () => { removeTable(); });
+
+    moreSettings.on('change', () => { moreSettingsHidden.toggleClass('more-settings__hidden'); });
+
+    tableBorderWidth.on('input', () => { $('.table').css('border-width', tableBorderWidth.val() + 'px'); });
+    tableBorderType.on('input', () => { $('.table').css('border-style', tableBorderType.val()); });
+    tableBorderColor.on('input', () => { $('.table').css('border-color', tableBorderColor.val()); });
+
+    tableDataPadding.on('input', () => { getTableData().css('padding', tableDataPadding.val() + 'px'); });
+    tableDataColor.on('input', () => { getTableData().css('background-color', tableDataColor.val()); });
+    tableFontSize.on('change', () => { getTableData().attr('class', 'table-data ' + tableFontSize.val()); });
+    tableFontColor.on('input', () => { getTableData().css('color', tableFontColor.val()); });
+
+    tableDataWidth.on('input', () => { getTableData().css('border-width', tableDataWidth.val()); });
+    dataBorderType.on('change', () => { getTableData().css('border-style', dataBorderType.val()); });
+    dataBorderColor.on('input', () => { getTableData().css('border-color', dataBorderColor.val()); });
 });
